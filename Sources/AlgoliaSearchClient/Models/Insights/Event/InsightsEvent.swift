@@ -10,6 +10,7 @@ import Foundation
 public struct InsightsEvent {
 
   public let type: EventType
+  public let subType: EventSubType?
   public let name: EventName
   public let indexName: IndexName
   public let userToken: UserToken?
@@ -18,6 +19,7 @@ public struct InsightsEvent {
   public let resources: Resources
 
   init(type: EventType,
+       subType: EventSubType? = nil,
        name: EventName,
        indexName: IndexName,
        userToken: UserToken?,
@@ -29,6 +31,7 @@ public struct InsightsEvent {
     try ConstructionError.check(resources)
 
     self.type = type
+    self.subType = subType
     self.name = name
     self.indexName = indexName
     self.userToken = userToken
@@ -38,6 +41,7 @@ public struct InsightsEvent {
   }
 
   init(type: EventType,
+       subType: EventSubType? = nil,
        name: EventName,
        indexName: IndexName,
        userToken: UserToken?,
@@ -46,6 +50,7 @@ public struct InsightsEvent {
        resources: Resources) throws {
     let rawTimestamp = timestamp?.timeIntervalSince1970.milliseconds
     try self.init(type: type,
+                  subType:subType,
                   name: name,
                   indexName: indexName,
                   userToken: userToken,
@@ -61,6 +66,7 @@ extension InsightsEvent: Codable {
   enum CodingKeys: String, CodingKey, CaseIterable {
     case type = "eventType"
     case name = "eventName"
+    case subType = "eventSubtype"
     case indexName = "index"
     case userToken
     case timestamp
@@ -71,6 +77,7 @@ extension InsightsEvent: Codable {
   public init(from decoder: Decoder) throws {
     let container = try decoder.container(keyedBy: CodingKeys.self)
     self.type = try container.decode(forKey: .type)
+    self.subType = try container.decodeIfPresent(forKey: .subType)
     self.name = try container.decode(forKey: .name)
     self.indexName = try container.decode(forKey: .indexName)
     self.userToken = try container.decodeIfPresent(forKey: .userToken)
@@ -87,6 +94,7 @@ extension InsightsEvent: Codable {
     try container.encodeIfPresent(userToken, forKey: .userToken)
     try container.encodeIfPresent(timestamp, forKey: .timestamp)
     try container.encodeIfPresent(queryID, forKey: .queryID)
+    try container.encodeIfPresent(subType, forKey: .subType)
     try resources.encode(to: encoder)
   }
 
@@ -99,6 +107,7 @@ extension InsightsEvent: CustomStringConvertible {
     \n{
       name: \"\(name)\",
       type: \(type),
+      subType: \(subType?.description ?? "none"),
       indexName: \(indexName),
       userToken: \(userToken ?? "none"),
       timestamp: \(timestamp?.description ?? "none"),

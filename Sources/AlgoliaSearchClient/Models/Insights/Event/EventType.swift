@@ -28,3 +28,24 @@ extension InsightsEvent {
   }
 
 }
+
+extension InsightsEvent {
+
+  public struct EventSubType: StringOption, ProvidingCustomOption, CustomStringConvertible {
+
+    public static var addToCart: Self { .init(rawValue: #function) }
+    public static var purchase: Self { .init(rawValue: #function) }
+
+    public let rawValue: String
+
+    public init(rawValue: String) {
+      self.rawValue = rawValue
+    }
+
+    public var description: String {
+      rawValue
+    }
+
+  }
+
+}

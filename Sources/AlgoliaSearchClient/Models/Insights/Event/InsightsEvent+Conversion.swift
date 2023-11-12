@@ -9,13 +9,15 @@ import Foundation
 
 public extension InsightsEvent {
 
-  static func conversion(name: EventName,
+  static func conversion(subType: EventSubType?=nil,
+                         name: EventName,
                          indexName: IndexName,
                          userToken: UserToken?,
                          timestamp: Date? = nil,
                          queryID: QueryID?,
                          objectIDs: [ObjectID]) throws -> Self {
     return try self.init(type: .conversion,
+                         subType: subType,
                          name: name,
                          indexName: indexName,
                          userToken: userToken,
@@ -24,13 +26,15 @@ public extension InsightsEvent {
                          resources: .objectIDs(objectIDs))
   }
 
-  static func conversion(name: EventName,
+  static func conversion(subType: EventSubType?=nil,
+                         name: EventName,
                          indexName: IndexName,
                          userToken: UserToken?,
                          timestamp: Date? = nil,
                          queryID: QueryID?,
                          filters: [String]) throws -> Self {
     return try self.init(type: .conversion,
+                         subType: subType,
                          name: name,
                          indexName: indexName,
                          userToken: userToken,
