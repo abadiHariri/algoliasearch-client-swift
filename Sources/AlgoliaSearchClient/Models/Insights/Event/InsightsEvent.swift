@@ -7,16 +7,33 @@
 
 import Foundation
 
+
+public struct ObjectDataEvent: Codable {
+    public init(queryID: QueryID? = nil, price: Double? = nil, discount: Double? = nil, quantity: Int? = nil) {
+        self.queryID = queryID
+        self.price = price
+        self.discount = discount
+        self.quantity = quantity
+    }
+    
+    let queryID:QueryID?
+    let price:Double?
+    let discount:Double?
+    let quantity:Int?
+}
+
 public struct InsightsEvent {
 
-  public let type: EventType
-  public let subType: EventSubType?
-  public let name: EventName
-  public let indexName: IndexName
-  public let userToken: UserToken?
-  public let timestamp: Int64?
-  public let queryID: QueryID?
-  public let resources: Resources
+    public let type: EventType
+    public let subType: EventSubType?
+    public let name: EventName
+    public let indexName: IndexName
+    public let userToken: UserToken?
+    public let timestamp: Int64?
+    public let queryID: QueryID?
+    public let resources: Resources
+    public let objectData: [ObjectDataEvent]?
+    public let currency: String?
 
   init(type: EventType,
        subType: EventSubType? = nil,
@@ -25,19 +42,23 @@ public struct InsightsEvent {
        userToken: UserToken?,
        timestamp: Int64?,
        queryID: QueryID?,
+       objectData: [ObjectDataEvent]? = nil,
+       currency: String? = nil,
        resources: Resources) throws {
 
     try ConstructionError.checkEventName(name)
     try ConstructionError.check(resources)
 
-    self.type = type
-    self.subType = subType
-    self.name = name
-    self.indexName = indexName
-    self.userToken = userToken
-    self.timestamp = timestamp
-    self.queryID = queryID
-    self.resources = resources
+      self.type = type
+      self.subType = subType
+      self.name = name
+      self.indexName = indexName
+      self.userToken = userToken
+      self.timestamp = timestamp
+      self.queryID = queryID
+      self.resources = resources
+      self.objectData = objectData
+      self.currency = currency
   }
 
   init(type: EventType,
@@ -47,6 +68,8 @@ public struct InsightsEvent {
        userToken: UserToken?,
        timestamp: Date?,
        queryID: QueryID?,
+       objectData: [ObjectDataEvent]? = nil,
+       currency: String? = nil,
        resources: Resources) throws {
     let rawTimestamp = timestamp?.timeIntervalSince1970.milliseconds
     try self.init(type: type,
@@ -56,7 +79,10 @@ public struct InsightsEvent {
                   userToken: userToken,
                   timestamp: rawTimestamp,
                   queryID: queryID,
+                  objectData: objectData,
+                  currency: currency,
                   resources: resources)
+           
   }
 
 }
@@ -72,6 +98,8 @@ extension InsightsEvent: Codable {
     case timestamp
     case queryID
     case positions
+      case objectData
+      case currency
   }
 
   public init(from decoder: Decoder) throws {
@@ -83,6 +111,8 @@ extension InsightsEvent: Codable {
     self.userToken = try container.decodeIfPresent(forKey: .userToken)
     self.timestamp = try container.decodeIfPresent(forKey: .timestamp)
     self.queryID = try container.decodeIfPresent(forKey: .queryID)
+      self.currency = try container.decodeIfPresent(forKey: .currency)
+      self.objectData = try container.decodeIfPresent(forKey: .objectData)
     self.resources = try Resources(from: decoder)
   }
 
@@ -95,10 +125,13 @@ extension InsightsEvent: Codable {
     try container.encodeIfPresent(timestamp, forKey: .timestamp)
     try container.encodeIfPresent(queryID, forKey: .queryID)
     try container.encodeIfPresent(subType, forKey: .subType)
+      try container.encodeIfPresent(currency, forKey: .currency)
+      try container.encodeIfPresent(objectData, forKey: .objectData)
     try resources.encode(to: encoder)
   }
 
 }
+
 
 extension InsightsEvent: CustomStringConvertible {
 
@@ -111,6 +144,8 @@ extension InsightsEvent: CustomStringConvertible {
       indexName: \(indexName),
       userToken: \(userToken ?? "none"),
       timestamp: \(timestamp?.description ?? "none"),
+      currency: \(currency ?? "none"),
+      objectData: \(objectData ?? []),
       queryID: \(queryID ?? "none"),
       \(resources)
     }

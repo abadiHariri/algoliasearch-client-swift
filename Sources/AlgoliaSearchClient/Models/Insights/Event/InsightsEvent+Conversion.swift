@@ -8,14 +8,16 @@
 import Foundation
 
 public extension InsightsEvent {
-
+ 
   static func conversion(subType: EventSubType?=nil,
                          name: EventName,
                          indexName: IndexName,
                          userToken: UserToken?,
                          timestamp: Date? = nil,
                          queryID: QueryID?,
-                         objectIDs: [ObjectID]) throws -> Self {
+                         objectIDs: [ObjectID],
+                         objectData: [ObjectDataEvent]? = nil,
+                         currency: String? = nil) throws -> Self {
     return try self.init(type: .conversion,
                          subType: subType,
                          name: name,
@@ -23,6 +25,8 @@ public extension InsightsEvent {
                          userToken: userToken,
                          timestamp: timestamp,
                          queryID: queryID,
+                         objectData: objectData,
+                         currency: currency,
                          resources: .objectIDs(objectIDs))
   }
 
