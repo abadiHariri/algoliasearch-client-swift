@@ -28,7 +28,7 @@ let extraTargetDependencies: [Target.Dependency] = []
 let package = Package(
   name: "AlgoliaSearchClient",
   platforms: [
-    .iOS(.v9),
+    .iOS(.v13),
     .macOS(macOSVersion),
     .watchOS(.v2),
     .tvOS(.v9)

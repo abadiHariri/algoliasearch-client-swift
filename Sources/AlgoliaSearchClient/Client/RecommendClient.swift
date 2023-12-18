@@ -1,6 +1,6 @@
 //
 //  RecommendClient.swift
-//  
+//
 //
 //  Created by Vladislav Fitc on 31/08/2021.
 //
@@ -102,6 +102,31 @@ public extension RecommendClient {
     return execute(command, completion: completion)
   }
 
+ 
+    func getRecommendationAsync(options: [RecommendationsOptions], requestOptions: RequestOptions? = nil) async throws -> SearchesResponse {
+        let command = Command.Recommend.GetRecommendations(options: options, requestOptions: requestOptions)
+        
+        let searchOperations: SearchOperations = .init()
+        
+        return try await withTaskCancellationHandler {
+            
+            return try await withCheckedThrowingContinuation { continuation in
+                let operation = getRecommendations(options:options,requestOptions: requestOptions) { (result: Result<SearchesResponse, Error>) in
+                    switch result {
+                    case .success(let response):
+                        continuation.resume(returning: response)
+                    case .failure(let error):
+                        continuation.resume(throwing: error)
+                    }
+                }
+                
+                Task {await searchOperations.assign(operation: operation)}
+            }
+        } onCancel: {
+            Task {await searchOperations.cancel()}
+        }
+         
+    }
   /**
    Returns recommendations.
    
@@ -130,7 +155,11 @@ public extension RecommendClient {
                               requestOptions: requestOptions,
                               completion: completion)
   }
-
+    
+    @discardableResult func getRelatedProductsAsync(options: [RelatedProductsOptions],
+                                               requestOptions: RequestOptions? = nil) async throws -> SearchesResponse {
+      return try await getRecommendationAsync(options: options.map(\.recommendationsOptions),requestOptions: requestOptions)
+    }
   /**
    Returns [Related Products](https://algolia.com/doc/guides/algolia-ai/recommend/#related-products).
    
@@ -160,6 +189,12 @@ public extension RecommendClient {
                               completion: completion)
   }
 
+    @discardableResult func getFrequentlyBoughtTogetherAsync(options: [RelatedProductsOptions],
+                                               requestOptions: RequestOptions? = nil) async throws -> SearchesResponse {
+      return try await getRecommendationAsync(options: options.map(\.recommendationsOptions),
+                                              requestOptions: requestOptions)
+    }
+    
   /**
    Returns [Frequently Bought Together](https://algolia.com/doc/guides/algolia-ai/recommend/#frequently-bought-together) products.
    
@@ -173,4 +208,26 @@ public extension RecommendClient {
                                   requestOptions: requestOptions)
   }
 
+}
+
+public actor SearchOperations {
+    var operation: Operation?
+    
+    public init() {
+       
+    }
+    
+    
+    public func assign(operation: Operation?) {
+        
+        cancel()
+        
+        self.operation = operation
+    }
+    
+    
+    public func cancel () {
+        operation?.cancel()
+        operation = nil
+    }
 }
