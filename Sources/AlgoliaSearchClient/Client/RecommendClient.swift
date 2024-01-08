@@ -104,8 +104,6 @@ public extension RecommendClient {
 
  
     func getRecommendationAsync(options: [RecommendationsOptions], requestOptions: RequestOptions? = nil) async throws -> SearchesResponse {
-        let command = Command.Recommend.GetRecommendations(options: options, requestOptions: requestOptions)
-        
         let searchOperations: SearchOperations = .init()
         
         return try await withTaskCancellationHandler {

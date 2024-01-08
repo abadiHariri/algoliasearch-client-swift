@@ -43,7 +43,34 @@ public extension Index {
     let command = Command.Search.Search(indexName: name, query: query, requestOptions: requestOptions)
     return try execute(command)
   }
-
+    
+    
+    
+    @discardableResult func searchAsync(query: Query,
+                                        requestOptions: RequestOptions? = nil) async throws -> SearchResponse {
+        let searchOperations: SearchOperations = .init()
+        
+        return try await withTaskCancellationHandler {
+            
+            return try await withCheckedThrowingContinuation { continuation in
+                let operation = search(query: query,
+                                       requestOptions: requestOptions)  { (result: Result<SearchResponse, Error>) in
+                    switch result {
+                    case .success(let response):
+                        continuation.resume(returning: response)
+                    case .failure(let error):
+                        continuation.resume(throwing: error)
+                    }
+                }
+                
+                Task {await searchOperations.assign(operation: operation)}
+            }
+        } onCancel: {
+            Task {await searchOperations.cancel()}
+        }
+    }
+    
+    
   // MARK: - Multiple Queries
 
   /**
@@ -78,6 +105,34 @@ public extension Index {
     let command = Command.MultipleIndex.Queries(indexName: name, queries: queries, strategy: strategy, requestOptions: requestOptions)
     return try transport.execute(command)
   }
+    
+    @discardableResult func searchAsync(queries: [Query],
+                                        strategy: MultipleQueriesStrategy = .none,
+                                        requestOptions: RequestOptions? = nil) async throws -> SearchesResponse {
+        let searchOperations: SearchOperations = .init()
+        
+        return try await withTaskCancellationHandler {
+            
+            return try await withCheckedThrowingContinuation { continuation in
+                let operation = search(queries: queries,
+                                       strategy: strategy,
+                                       requestOptions: requestOptions)  { (result: Result<SearchesResponse, Error>) in
+                    switch result {
+                    case .success(let response):
+                        continuation.resume(returning: response)
+                    case .failure(let error):
+                        continuation.resume(throwing: error)
+                    }
+                }
+                
+                Task {await searchOperations.assign(operation: operation)}
+            }
+        } onCancel: {
+            Task {await searchOperations.cancel()}
+        }
+        
+    }
+    
 
   // MARK: - Disjunctive Faceting
 
