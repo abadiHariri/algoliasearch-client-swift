@@ -36,13 +36,13 @@ public struct AnalyticsClient: Credentials {
 
   }
 
-  public init(configuration: AnalyticsConfiguration, requester: HTTPRequester) {
+  public init(configuration: AnalyticsConfiguration, requester: HTTPRequester, hostsExpirationDelay: TimeInterval = .minutes(5)) {
 
     let queue = OperationQueue()
     queue.qualityOfService = .userInitiated
     let operationLauncher = OperationLauncher(queue: queue)
 
-    let retryStrategy = AlgoliaRetryStrategy(configuration: configuration)
+    let retryStrategy = AlgoliaRetryStrategy(configuration: configuration,hostsExpirationDelay: hostsExpirationDelay)
 
     let httpTransport = HTTPTransport(requester: requester,
                                       configuration: configuration,

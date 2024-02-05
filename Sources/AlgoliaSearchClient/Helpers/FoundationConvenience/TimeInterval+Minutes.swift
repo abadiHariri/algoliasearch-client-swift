@@ -25,7 +25,7 @@ extension TimeInterval {
 
 }
 
-extension TimeInterval {
+public extension TimeInterval {
 
   static let minute: TimeInterval = 60
 
@@ -35,7 +35,7 @@ extension TimeInterval {
 
 }
 
-extension TimeInterval {
+public extension TimeInterval {
 
   static let second: TimeInterval = 1
 
@@ -45,7 +45,7 @@ extension TimeInterval {
 
 }
 
-extension TimeInterval {
+public extension TimeInterval {
 
   static let day: TimeInterval = hour * 24
 

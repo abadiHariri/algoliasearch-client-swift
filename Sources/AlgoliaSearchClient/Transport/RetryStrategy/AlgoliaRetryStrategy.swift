@@ -19,14 +19,15 @@ class AlgoliaRetryStrategy: RetryStrategy {
 
   /// Concurrent synchronization queue
   private let queue = DispatchQueue(label: "AlgoliaRetryStrategySync.queue")
-
+//  let allowRetry: Bool
+    
   init(hosts: [RetryableHost], hostsExpirationDelay: TimeInterval = .minutes(5)) {
     self.hosts = hosts
     self.hostsExpirationDelay = hostsExpirationDelay
   }
 
-  convenience init(configuration: Configuration) {
-    self.init(hosts: configuration.hosts)
+  convenience init(configuration: Configuration, hostsExpirationDelay: TimeInterval = .minutes(5)) {
+    self.init(hosts: configuration.hosts, hostsExpirationDelay: hostsExpirationDelay)
   }
 
   func retryableHosts(for callType: CallType) -> HostIterator {

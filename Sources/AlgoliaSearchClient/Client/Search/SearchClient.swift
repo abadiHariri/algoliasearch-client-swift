@@ -41,13 +41,13 @@ public struct SearchClient: Credentials {
   }
 
   public init(configuration: SearchConfiguration,
-              requester: HTTPRequester = URLSession(configuration: .default)) {
+              requester: HTTPRequester = URLSession(configuration: .default), hostsExpirationDelay: TimeInterval = .minutes(5)) {
 
     let queue = OperationQueue()
     queue.qualityOfService = .userInitiated
     let operationLauncher = OperationLauncher(queue: queue)
 
-    let retryStrategy = AlgoliaRetryStrategy(configuration: configuration)
+    let retryStrategy = AlgoliaRetryStrategy(configuration: configuration,hostsExpirationDelay: hostsExpirationDelay)
 
     let httpTransport = HTTPTransport(requester: requester,
                                       configuration: configuration,
