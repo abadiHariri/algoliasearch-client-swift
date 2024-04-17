@@ -15,6 +15,7 @@ public extension InsightsEvent {
                     timestamp: Date? = nil,
                     queryID: QueryID,
                     objectData: [ObjectDataEvent]? = nil,
+                    value: String? = nil,
                     currency: String? = nil,
                     objectIDsWithPositions: [(ObjectID, Int)]) throws -> Self {
     return try self.init(type: .click,
@@ -24,6 +25,7 @@ public extension InsightsEvent {
                          timestamp: timestamp,
                          queryID: queryID,
                          objectData: objectData,
+                         value: value,
                          currency: currency,
                          resources: .objectIDsWithPositions(objectIDsWithPositions))
   }
@@ -34,6 +36,7 @@ public extension InsightsEvent {
                     timestamp: Date? = nil,
                     objectIDs: [ObjectID],
                     objectData: [ObjectDataEvent]? = nil,
+                    value: String? = nil,
                     currency: String? = nil) throws -> Self {
     return try self.init(type: .click,
                          name: name,
@@ -42,6 +45,7 @@ public extension InsightsEvent {
                          timestamp: timestamp,
                          queryID: .none,
                          objectData: objectData,
+                         value: value,
                          currency: currency,
                          resources: .objectIDs(objectIDs))
   }

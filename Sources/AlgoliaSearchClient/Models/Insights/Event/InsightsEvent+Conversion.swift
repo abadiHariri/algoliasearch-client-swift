@@ -1,6 +1,6 @@
 //
 //  InsightsEvent+Conversion.swift
-//  
+//
 //
 //  Created by Vladislav Fitc on 23/04/2020.
 //
@@ -17,6 +17,7 @@ public extension InsightsEvent {
                          queryID: QueryID?,
                          objectIDs: [ObjectID],
                          objectData: [ObjectDataEvent]? = nil,
+                         value:String? = nil,
                          currency: String? = nil) throws -> Self {
     return try self.init(type: .conversion,
                          subType: subType,
@@ -26,6 +27,7 @@ public extension InsightsEvent {
                          timestamp: timestamp,
                          queryID: queryID,
                          objectData: objectData,
+                         value: value,
                          currency: currency,
                          resources: .objectIDs(objectIDs))
   }
