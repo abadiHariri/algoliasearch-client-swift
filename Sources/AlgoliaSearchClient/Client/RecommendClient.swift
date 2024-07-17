@@ -101,9 +101,8 @@ public extension RecommendClient {
     let command = Command.Recommend.GetRecommendations(options: options, requestOptions: requestOptions)
     return execute(command, completion: completion)
   }
-
- 
-    func getRecommendationAsync(options: [RecommendationsOptions], requestOptions: RequestOptions? = nil) async throws -> SearchesResponse {
+    
+  @discardableResult func getRecommendationAsync(options: [RecommendationsOptions], requestOptions: RequestOptions? = nil) async throws -> SearchesResponse {
         let searchOperations: SearchOperations = .init()
         
         return try await withTaskCancellationHandler {
@@ -138,6 +137,11 @@ public extension RecommendClient {
     return try execute(command)
   }
 
+    
+    @discardableResult func getRecommendationAsync(option: RecommendationsOptions, requestOptions: RequestOptions? = nil) async throws -> SearchesResponse {
+        return try await getRecommendationAsync(options: [option], requestOptions: requestOptions)
+    }
+    
   /**
    Returns [Related Products](https://algolia.com/doc/guides/algolia-ai/recommend/#related-products).
    
@@ -154,9 +158,15 @@ public extension RecommendClient {
                               completion: completion)
   }
     
-    @discardableResult func getRelatedProductsAsync(options: [RelatedProductsOptions],
+    @discardableResult func getRelatedProductsAsync(option: RelatedProductsOptions,
                                                requestOptions: RequestOptions? = nil) async throws -> SearchesResponse {
-      return try await getRecommendationAsync(options: options.map(\.recommendationsOptions),requestOptions: requestOptions)
+        return try await getRecommendationAsync(options: [option.recommendationsOptions], requestOptions: requestOptions)
+    }
+    
+    
+    @discardableResult func getTrendingItemsAsync(option: TrendingItemsOptions,
+                                               requestOptions: RequestOptions? = nil) async throws -> SearchesResponse {
+        return try await getRecommendationAsync(options: [option.recommendationsOptions],requestOptions: requestOptions)
     }
   /**
    Returns [Related Products](https://algolia.com/doc/guides/algolia-ai/recommend/#related-products).

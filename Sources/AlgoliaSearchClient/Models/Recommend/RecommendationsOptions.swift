@@ -1,6 +1,6 @@
 //
 //  RecommendationsOptions.swift
-//  
+//
 //
 //  Created by Vladislav Fitc on 01/09/2021.
 //
@@ -15,8 +15,12 @@ public struct RecommendationsOptions: Codable {
   /// The recommendation model to use
   public let model: RecommendationModel
 
+  public let facetName: String?
+ 
+  public let facetValue: String?
+    
   /// The objectID to get recommendations for
-  public let objectID: ObjectID
+  public let objectID: ObjectID?
 
   /// The threshold to use when filtering recommendations by their score
   public let threshold: Int
@@ -41,9 +45,11 @@ public struct RecommendationsOptions: Codable {
    */
   public init(indexName: IndexName,
               model: RecommendationModel,
-              objectID: ObjectID,
+              objectID: ObjectID? = nil,
               threshold: Int = 0,
               maxRecommendations: Int? = nil,
+              facetName: String? = nil,
+              facetValue: String? = nil,
               queryParameters: Query? = nil,
               fallbackParameters: Query? = nil) {
     self.indexName = indexName
@@ -51,6 +57,8 @@ public struct RecommendationsOptions: Codable {
     self.objectID = objectID
     self.threshold = threshold
     self.maxRecommendations = maxRecommendations
+    self.facetName = facetName
+    self.facetValue = facetValue
     self.queryParameters = queryParameters
     self.fallbackParameters = fallbackParameters
   }
@@ -59,7 +67,7 @@ public struct RecommendationsOptions: Codable {
 
 public struct FrequentlyBoughtTogetherOptions {
 
-  internal let recommendationsOptions: RecommendationsOptions
+    public let recommendationsOptions: RecommendationsOptions
 
   /**
    - parameter indexName: Name of the index to target
@@ -86,7 +94,7 @@ public struct FrequentlyBoughtTogetherOptions {
 
 public struct RelatedProductsOptions {
 
-  internal let recommendationsOptions: RecommendationsOptions
+    public let recommendationsOptions: RecommendationsOptions
 
   /**
    - parameter indexName: Name of the index to target
@@ -107,6 +115,37 @@ public struct RelatedProductsOptions {
                                    objectID: objectID,
                                    threshold: threshold,
                                    maxRecommendations: maxRecommendations,
+                                   queryParameters: queryParameters,
+                                   fallbackParameters: fallbackParameters)
+  }
+
+}
+
+public struct TrendingItemsOptions {
+
+  public let recommendationsOptions: RecommendationsOptions
+
+  /**
+   - parameter indexName: Name of the index to target
+   - parameter objectID: The objectID to get recommendations for
+   - parameter threshold: The threshold to use when filtering recommendations by their score
+   - parameter maxRecommendations: The maximum number of recommendations to retrieve
+   - parameter queryParameters: Search parameters to filter the recommendations
+   - parameter fallbackParameters: Search parameters to use as fallback when there are no recommendations
+   */
+  public init(indexName: IndexName,
+              threshold: Int = 0,
+              maxRecommendations: Int? = nil,
+              facetName: String? = nil,
+              facetValue: String? = nil,
+              queryParameters: Query? = nil,
+              fallbackParameters: Query? = nil) {
+    recommendationsOptions = .init(indexName: indexName,
+                                   model: .trendingItems,
+                                   threshold: threshold,
+                                   maxRecommendations: maxRecommendations,
+                                   facetName: facetName,
+                                   facetValue: facetValue,
                                    queryParameters: queryParameters,
                                    fallbackParameters: fallbackParameters)
   }
