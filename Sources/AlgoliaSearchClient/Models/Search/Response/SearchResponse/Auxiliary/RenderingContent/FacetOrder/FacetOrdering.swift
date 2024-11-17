@@ -1,6 +1,6 @@
 //
 //  FacetOrdering.swift
-//  
+//
 //
 //  Created by Vladislav Fitc on 15/06/2021.
 //
@@ -15,7 +15,7 @@ public struct FacetOrdering {
 
   /// The ordering of facet values, within an individual list.
   public let values: [Attribute: FacetValuesOrder]
-
+    public var OrignalValues: [String: FacetValuesOrder] = [:]
   /**
    - parameters:
      - facets: The ordering of facets.
@@ -30,17 +30,23 @@ public struct FacetOrdering {
 }
 
 extension FacetOrdering: Codable {
-
-  enum CodingKeys: String, CodingKey {
-    case facets
-    case values
-  }
-
-  public init(from decoder: Decoder) throws {
-    let container = try decoder.container(keyedBy: CodingKeys.self)
-    self.facets = try container.decodeIfPresent(forKey: .facets) ?? FacetsOrder()
-    let rawValues = try container.decodeIfPresent([String: FacetValuesOrder].self, forKey: .values) ?? [:]
-    self.values = rawValues.mapKeys(Attribute.init)
-  }
-
+    
+    enum CodingKeys: String, CodingKey {
+        case facets
+        case values
+    }
+    
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        self.facets = try container.decodeIfPresent(forKey: .facets) ?? FacetsOrder()
+        let rawValues = try container.decodeIfPresent([String: FacetValuesOrder].self, forKey: .values) ?? [:]
+        self.OrignalValues = rawValues
+        self.values = rawValues.mapKeys(Attribute.init)
+    }
+    
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encodeIfPresent(facets, forKey: .facets)
+        try container.encodeIfPresent(OrignalValues, forKey: .values)
+    }
 }
