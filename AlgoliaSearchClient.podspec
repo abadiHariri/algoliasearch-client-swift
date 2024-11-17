@@ -1,7 +1,7 @@
 Pod::Spec.new do |spec|
   spec.name         = "AlgoliaSearchClient"
   spec.module_name  = 'AlgoliaSearchClient'
-  spec.version      = "8.20.1"
+  spec.version      = "8.21.0"
   spec.summary      = "Algolia Search API Client written in Swift."
   spec.homepage     = "https://github.com/algolia/algoliasearch-client-swift"
   spec.license      = { :type => "MIT", :file => "LICENSE" }
@@ -12,4 +12,5 @@ Pod::Spec.new do |spec|
   spec.source = { :git => "https://github.com/algolia/algoliasearch-client-swift.git", :tag => spec.version }
   spec.source_files  = "Sources/AlgoliaSearchClient/**/*.swift"
   spec.dependency 'Logging'
+  spec.resource_bundles = { 'AlgoliaSearchClient' => ['PrivacyInfo.xcprivacy']}
 end
