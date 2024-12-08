@@ -10,7 +10,17 @@ import Foundation
 /// Wraps a generic hit object with its meta information
 
 public struct Hit<T: Codable> {
-
+    
+    public init(objectID: ObjectID, object: T) {
+        self.objectID = objectID
+        self.object = object
+        self.snippetResult = nil
+        self.highlightResult = nil
+        self.rankingInfo = nil
+        self.geolocation = nil
+        self.answer = nil
+    }
+    
   public let objectID: ObjectID
   public let object: T
 
