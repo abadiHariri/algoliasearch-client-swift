@@ -1,6 +1,6 @@
 //
 //  SearchParameters.swift
-//  
+//
 //
 //  Created by Vladislav Fitc on 19/11/2020.
 //
@@ -276,6 +276,7 @@ public protocol SearchParameters: CommonParameters {
    - [Documentation](https://www.algolia.com/doc/api-reference/api-parameters/_/?language=swift)
    */
   var explainModules: [ExplainModule]? { get set }
+  var explain: [ExplainModule]? { get set }
 
   /**
    Whether this search should use [Dynamic Re-Ranking](https://www.algolia.com/doc/guides/algolia-ai/re-ranking/).

@@ -1,6 +1,6 @@
 //
 //  SearchParametersStorage.swift
-//  
+//
 //
 //  Created by Vladislav Fitc on 19/11/2020.
 //
@@ -76,6 +76,7 @@ public struct SearchParametersStorage: SearchParameters, Equatable {
   public var attributeCriteriaComputedByMinProximity: Bool?
   public var enableABTest: Bool?
   public var explainModules: [ExplainModule]?
+    public var explain: [ExplainModule]?
   public var relevancyStrictness: Int?
   public var enableReRanking: Bool?
 }
@@ -367,4 +368,10 @@ extension SearchParametersStorageContainer {
     get { searchParametersStorage.enableReRanking }
     set { searchParametersStorage.enableReRanking = newValue }
   }
+    
+    public var explain: [ExplainModule]? {
+      get { searchParametersStorage.explain }
+      set { searchParametersStorage.explain = newValue }
+    }
 }
+

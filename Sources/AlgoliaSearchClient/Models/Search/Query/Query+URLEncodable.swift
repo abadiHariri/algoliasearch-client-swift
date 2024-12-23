@@ -1,6 +1,6 @@
 //
 //  Query+URLEncodable.swift
-//  
+//
 //
 //  Created by Vladislav Fitc on 21/04/2020.
 //
@@ -121,6 +121,7 @@ extension Query: URLEncodable {
     urlEncoder.set(distinct, for: .distinct)
     urlEncoder.set(getRankingInfo, for: .getRankingInfo)
     urlEncoder.set(explainModules, for: .explainModules)
+    urlEncoder.set(explain, for: .explain)
     urlEncoder.set(attributesToRetrieve, for: .attributesToRetrieve)
     urlEncoder.set(restrictSearchableAttributes, for: .restrictSearchableAttributes)
     urlEncoder.set(filters, for: .filters)

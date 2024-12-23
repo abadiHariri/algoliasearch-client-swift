@@ -1,6 +1,6 @@
 //
 //  Query+Codable.swift
-//  
+//
 //
 //  Created by Vladislav Fitc on 20/03/2020.
 //
@@ -78,6 +78,7 @@ extension SearchParametersStorage: Codable {
     similarQuery = try container.decodeIfPresent(forKey: .similarQuery)
     enableABTest = try container.decodeIfPresent(forKey: .enableABTest)
     explainModules = try container.decodeIfPresent(forKey: .explainModules)
+    explain = try container.decodeIfPresent(forKey: .explain)
     naturalLanguages = try container.decodeIfPresent(forKey: .naturalLanguages)
     relevancyStrictness = try container.decodeIfPresent(forKey: .relevancyStrictness)
     enableReRanking = try container.decodeIfPresent(forKey: .enableReRanking)
@@ -151,6 +152,7 @@ extension SearchParametersStorage: Codable {
     try container.encodeIfPresent(similarQuery, forKey: .similarQuery)
     try container.encodeIfPresent(enableABTest, forKey: .enableABTest)
     try container.encodeIfPresent(explainModules, forKey: .explainModules)
+    try container.encodeIfPresent(explain, forKey: .explain)
     try container.encodeIfPresent(naturalLanguages, forKey: .naturalLanguages)
     try container.encodeIfPresent(relevancyStrictness, forKey: .relevancyStrictness)
     try container.encodeIfPresent(enableReRanking, forKey: .enableReRanking)
@@ -223,6 +225,7 @@ extension SearchParametersStorage: Codable {
     case similarQuery
     case enableABTest
     case explainModules
+    case explain
     case naturalLanguages
     case relevancyStrictness
     case enableReRanking
@@ -230,3 +233,4 @@ extension SearchParametersStorage: Codable {
 
 }
 // swiftlint:enable function_body_length
+
