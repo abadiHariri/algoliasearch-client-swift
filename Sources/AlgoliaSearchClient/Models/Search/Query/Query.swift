@@ -1,11 +1,22 @@
 //
 //  Query.swift
-//  
+//
 //
 //  Created by Vladislav Fitc on 17.02.2020.
 //
 
 import Foundation
+
+public indirect enum BaseQueryModel : Equatable {
+   case base(Query)
+    
+    public func getQuery() -> Query {
+        switch self {
+        case .base(let query):
+            return query
+        }
+    }
+}
 
 public struct Query: Equatable, SearchParameters {
 
@@ -13,8 +24,15 @@ public struct Query: Equatable, SearchParameters {
 
   /// Custom parameters
   public var customParameters: [String: JSON]?
-
-  public init(_ query: String? = nil) {
+  public var baseQuery: BaseQueryModel?
+  public var refinements: [Attribute: [String]] = [:]
+  public var disjunctiveFacets: Set<Attribute> = []
+  
+    public var fetchSmartFacetsInfo: Bool{
+      page == 0 && !disjunctiveFacets.isEmpty && (!refinements.values.isEmpty)
+    }
+    
+    public init(_ query: String? = nil) {
     searchParametersStorage = .init()
     self.searchParametersStorage.query = query
   }

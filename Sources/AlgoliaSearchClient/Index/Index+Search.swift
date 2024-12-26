@@ -148,20 +148,40 @@ public extension Index {
    - Parameter requestOptions: Configure request locally with RequestOptions.
    - Returns: SearchesResponse object
    */
-  func searchDisjunctiveFaceting(query: Query,
-                                 refinements: [Attribute: [String]],
-                                 disjunctiveFacets: Set<Attribute>,
-                                 keepSelectedEmptyFacets: Bool = true,
-                                 requestOptions: RequestOptions? = nil) throws -> SearchResponse {
-    let helper = DisjunctiveFacetingHelper(query: query,
-                                           refinements: refinements,
-                                           disjunctiveFacets: disjunctiveFacets)
-    let queries = helper.makeQueries()
-    let response = try search(queries: queries, requestOptions: requestOptions)
-    return try helper.mergeResponses(response.results,
-                                     keepSelectedEmptyFacets: keepSelectedEmptyFacets)
-  }
+//  func searchDisjunctiveFaceting(query: Query,
+//                                 refinements: [Attribute: [String]],
+//                                 disjunctiveFacets: Set<Attribute>,
+//                                 keepSelectedEmptyFacets: Bool = true,
+//                                 requestOptions: RequestOptions? = nil) throws -> SearchResponse {
+//    let helper = DisjunctiveFacetingHelper(query: query,
+//                                           refinements: refinements,
+//                                           disjunctiveFacets: disjunctiveFacets)
+//      let queries = helper.makeQueries(mainQuery: query)
+//    let response = try search(queries: queries, requestOptions: requestOptions)
+//    return try helper.mergeResponses(response.results,
+//                                     keepSelectedEmptyFacets: keepSelectedEmptyFacets)
+//  }
 
+    @discardableResult func searchDisjunctiveFaceting(query: Query,
+                                   _ queryWithoutSmartFacets: Query,
+                                                      requestOptions: RequestOptions? = nil) async throws -> SearchResponse {
+        
+        let helper = DisjunctiveFacetingHelper(query: queryWithoutSmartFacets,
+                                               refinements: query.refinements,
+                                               disjunctiveFacets: query.disjunctiveFacets)
+        
+        let queries = helper.makeQueries(mainQuery: query)
+        
+        if queries.count > 1 {
+            let response = try await searchAsync(queries: queries, requestOptions: requestOptions)
+            return try helper.mergeResponses(response.results,
+                                             keepSelectedEmptyFacets: true)
+        } else {
+            let response = try await searchAsync(query: query, requestOptions: requestOptions)
+            return response
+        }
+    }
+    
   /**
    Method used for perform search with disjunctive facets.
    
@@ -175,25 +195,25 @@ public extension Index {
    - Parameter completion: Result completion
    - Returns: Launched asynchronous operation
    */
-  func searchDisjunctiveFaceting(query: Query,
-                                 refinements: [Attribute: [String]],
-                                 disjunctiveFacets: Set<Attribute>,
-                                 keepSelectedEmptyFacets: Bool = true,
-                                 requestOptions: RequestOptions? = nil,
-                                 completion: @escaping ResultCallback<SearchResponse>) -> Operation & TransportTask {
-    let helper = DisjunctiveFacetingHelper(query: query,
-                                           refinements: refinements,
-                                           disjunctiveFacets: disjunctiveFacets)
-    let queries = helper.makeQueries()
-    return search(queries: queries, requestOptions: requestOptions) { result in
-      completion(result.flatMap { response in
-        Result {
-          try helper.mergeResponses(response.results,
-                                    keepSelectedEmptyFacets: keepSelectedEmptyFacets)
-        }
-      })
-    }
-  }
+//  func searchDisjunctiveFaceting(query: Query,
+//                                 refinements: [Attribute: [String]],
+//                                 disjunctiveFacets: Set<Attribute>,
+//                                 keepSelectedEmptyFacets: Bool = true,
+//                                 requestOptions: RequestOptions? = nil,
+//                                 completion: @escaping ResultCallback<SearchResponse>) -> Operation & TransportTask {
+//    let helper = DisjunctiveFacetingHelper(query: query,
+//                                           refinements: refinements,
+//                                           disjunctiveFacets: disjunctiveFacets)
+//    let queries = helper.makeQueries()
+//    return search(queries: queries, requestOptions: requestOptions) { result in
+//      completion(result.flatMap { response in
+//        Result {
+//          try helper.mergeResponses(response.results,
+//                                    keepSelectedEmptyFacets: keepSelectedEmptyFacets)
+//        }
+//      })
+//    }
+//  }
 
   // MARK: - Browse
 

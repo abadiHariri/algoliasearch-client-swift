@@ -1,6 +1,6 @@
 //
 //  DisjunctiveFacetingHelper.swift
-//  
+//
 //
 //  Created by Vladislav Fitc on 19/10/2022.
 //
@@ -46,18 +46,9 @@ struct DisjunctiveFacetingHelper {
 
   /// Build search queries to fetch the necessary facets information for disjunctive faceting
   /// If the disjunctive facets set is empty, makes a single request with applied conjunctive filters
-  func makeQueries() -> [Query] {
+    func makeQueries(mainQuery: Query) -> [Query] {
     var queries = [Query]()
-
-    var mainQuery = query
-    mainQuery.filters = [
-        mainQuery.filters,
-        buildFilters(excluding: .none)
-    ]
-          .compactMap { $0 }
-          .filter { !$0.isEmpty }
-          .joined(separator: " AND ")
-
+  
     queries.append(mainQuery)
 
     disjunctiveFacets
@@ -72,11 +63,21 @@ struct DisjunctiveFacetingHelper {
               .compactMap { $0 }
               .filter { !$0.isEmpty }
               .joined(separator: " AND ")
-      disjunctiveQuery.hitsPerPage = 0
-      disjunctiveQuery.attributesToRetrieve = []
-      disjunctiveQuery.attributesToHighlight = []
-      disjunctiveQuery.attributesToSnippet = []
-      disjunctiveQuery.analytics = false
+          disjunctiveQuery.hitsPerPage = 0
+          disjunctiveQuery.attributesToRetrieve = []
+          disjunctiveQuery.attributesToHighlight = []
+          disjunctiveQuery.attributesToSnippet = []
+          disjunctiveQuery.analytics = false
+          disjunctiveQuery.explain = nil
+          disjunctiveQuery.analyticsTags = []
+          disjunctiveQuery.attributesToRetrieve = []
+          disjunctiveQuery.attributesToSnippet = []
+          disjunctiveQuery.clickAnalytics = false
+          disjunctiveQuery.analytics = false
+          disjunctiveQuery.page = 0
+          disjunctiveQuery.refinements = [:]
+          disjunctiveQuery.disjunctiveFacets = []
+          
       queries.append(disjunctiveQuery)
     }
 
@@ -91,7 +92,7 @@ struct DisjunctiveFacetingHelper {
 
     let responsesForDisjunctiveFaceting = responses.dropFirst()
 
-    var mergedDisjunctiveFacets = [Attribute: [Facet]]()
+    var mergedDisjunctiveFacets = mainResponse.facets ?? [Attribute: [Facet]]()
     var mergedFacetStats = mainResponse.facetStats ?? [:]
     var mergedExhaustiveFacetsCount = mainResponse.exhaustiveFacetsCount ?? true
 
@@ -118,7 +119,8 @@ struct DisjunctiveFacetingHelper {
         mergedExhaustiveFacetsCount = mergedExhaustiveFacetsCount && exhaustiveFacetsCount
       }
     }
-    mainResponse.disjunctiveFacets = mergedDisjunctiveFacets
+      
+    mainResponse.facets = mergedDisjunctiveFacets
     mainResponse.facetStats = mergedFacetStats
     mainResponse.exhaustiveFacetsCount = mergedExhaustiveFacetsCount
 
