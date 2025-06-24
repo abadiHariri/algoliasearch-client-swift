@@ -1,6 +1,6 @@
 //
 //  Hit.swift
-//  
+//
 //
 //  Created by Vladislav Fitc on 13.03.2020.
 //
@@ -21,7 +21,7 @@ public struct Hit<T: Codable> {
         self.answer = nil
     }
     
-  public let objectID: ObjectID
+  public let objectID: ObjectID?
   public let object: T
 
   /// Snippeted attributes. Only returned when `attributesToSnippet` is non-empty.
@@ -55,12 +55,12 @@ extension Hit: Codable {
   public init(from decoder: Decoder) throws {
     self.object = try T(from: decoder)
     let container = try decoder.container(keyedBy: CodingKeys.self)
-    self.objectID = try container.decode(ObjectID.self, forKey: .objectID)
-    self.snippetResult = try container.decodeIfPresent(TreeModel<SnippetResult>.self, forKey: .snippetResult)
-    self.highlightResult = try container.decodeIfPresent(TreeModel<HighlightResult>.self, forKey: .highlightResult)
-    self.rankingInfo = try container.decodeIfPresent(RankingInfo.self, forKey: .rankingInfo)
+    self.objectID = try? container.decodeIfPresent(ObjectID.self, forKey: .objectID)
+    self.snippetResult = try? container.decodeIfPresent(TreeModel<SnippetResult>.self, forKey: .snippetResult)
+    self.highlightResult = try? container.decodeIfPresent(TreeModel<HighlightResult>.self, forKey: .highlightResult)
+    self.rankingInfo = try? container.decodeIfPresent(RankingInfo.self, forKey: .rankingInfo)
     self.geolocation = try? container.decodeIfPresent(SingleOrList<Point>.self, forKey: .geolocation)
-    self.answer = try container.decodeIfPresent(forKey: .answer)
+    self.answer = try? container.decodeIfPresent(forKey: .answer)
   }
 
   public func encode(to encoder: Encoder) throws {

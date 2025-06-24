@@ -151,3 +151,33 @@ public struct TrendingItemsOptions {
   }
 
 }
+
+public struct TrendingFacetsOptions {
+
+  public let recommendationsOptions: RecommendationsOptions
+
+  /**
+   - parameter indexName: Name of the index to target
+   - parameter objectID: The objectID to get recommendations for
+   - parameter threshold: The threshold to use when filtering recommendations by their score
+   - parameter maxRecommendations: The maximum number of recommendations to retrieve
+   - parameter queryParameters: Search parameters to filter the recommendations
+   - parameter fallbackParameters: Search parameters to use as fallback when there are no recommendations
+   */
+  public init(indexName: IndexName,
+              threshold: Int = 0,
+              maxRecommendations: Int? = nil,
+              facetName: String? = nil,
+              queryParameters: Query? = nil,
+              fallbackParameters: Query? = nil) {
+    recommendationsOptions = .init(indexName: indexName,
+                                   model: .trendingFacets,
+                                   threshold: threshold,
+                                   maxRecommendations: maxRecommendations,
+                                   facetName: facetName,
+                                   facetValue: nil,
+                                   queryParameters: queryParameters,
+                                   fallbackParameters: fallbackParameters)
+  }
+
+}

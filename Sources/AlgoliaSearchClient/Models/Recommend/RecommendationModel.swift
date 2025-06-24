@@ -17,5 +17,7 @@ public enum RecommendationModel: String, Codable {
   case boughtTogether = "bought-together"
     
   case trendingItems = "trending-items"
+    
+  case trendingFacets = "trending-facets"
 
 }
