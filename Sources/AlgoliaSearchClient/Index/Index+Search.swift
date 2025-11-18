@@ -1,6 +1,6 @@
 //
 //  Index+Search.swift
-//  
+//
 //
 //  Created by Vladislav Fitc on 03/03/2020.
 //
@@ -316,7 +316,73 @@ public extension Index {
     let command = Command.Search.SearchForFacets(indexName: name, attribute: facetName, facetQuery: facetQuery, query: searchQuery, requestOptions: requestOptions)
     return execute(command, completion: completion)
   }
+    
+    @discardableResult func searchForFacetValues(of facetName: Attribute,
+                                                 matching facetQuery: String,
+                                                 searchQuerys: [Query],
+                                                 requestOptions: RequestOptions? = nil,
+                                                 completion: @escaping ResultCallback<FacetSearchResponses>) -> Operation & TransportTask {
+        let command = Command.MultipleIndex.FacetQueries(indexName: name, queries: searchQuerys, attribute: facetName, requestOptions: requestOptions)
+      return execute(command, completion: completion)
+    }
 
+    @discardableResult func searchForFacetValuesAsync(facetName: Attribute,
+                                        facetQuery: String,
+                                        searchQuery: Query? = nil,
+                                        requestOptions: RequestOptions? = nil,) async throws -> FacetSearchResponse {
+        let searchOperations: SearchOperations = .init()
+        
+        return try await withTaskCancellationHandler {
+            return try await withCheckedThrowingContinuation { continuation in
+                let operation = searchForFacetValues(of: facetName,
+                                              matching: facetQuery,
+                                              applicableFor:searchQuery,
+                                              requestOptions:requestOptions) { result in
+                    switch result {
+                    case .success(let respone):
+                        continuation.resume(returning: respone)
+                    case .failure(let error):
+                        continuation.resume(throwing: error)
+                    }
+                    
+                }
+                
+                Task {await searchOperations.assign(operation: operation)}
+            }
+        } onCancel: {
+            Task {await searchOperations.cancel()}
+        }
+    }
+    
+    @discardableResult func searchForFacetValuesAsync(facetName: Attribute,
+                                        facetQuery: String,
+                                        searchQuerys: [Query],
+                                        requestOptions: RequestOptions? = nil,) async throws -> FacetSearchResponse {
+        let searchOperations: SearchOperations = .init()
+        
+        return try await withTaskCancellationHandler {
+            return try await withCheckedThrowingContinuation { continuation in
+                let operation = searchForFacetValues(of: facetName,
+                                              matching: facetQuery,
+                                              searchQuerys:searchQuerys,
+                                              requestOptions:requestOptions) { result in
+                    switch result {
+                    case .success(let respone):
+                        let factes = respone.results.flatMap{$0.facetHits}
+                        continuation.resume(returning: FacetSearchResponse(facetHits: factes, exhaustiveFacetsCount: true, processingTimeMS: .zero))
+                    case .failure(let error):
+                        continuation.resume(throwing: error)
+                    }
+                    
+                }
+                
+                Task {await searchOperations.assign(operation: operation)}
+            }
+        } onCancel: {
+            Task {await searchOperations.cancel()}
+        }
+    }
+    
   /**
    Search for a set of values within a given facet attribute. Can be combined with a query. This
    method enables you to search through the values of a facet attribute, selecting only a subset

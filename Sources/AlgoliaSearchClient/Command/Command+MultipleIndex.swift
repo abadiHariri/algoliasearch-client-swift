@@ -1,6 +1,6 @@
 //
 //  Command+MultipleIndex.swift
-//  
+//
 //
 //  Created by Vladislav Fitc on 04/04/2020.
 //
@@ -129,6 +129,48 @@ extension Command {
       }
 
     }
+      
+      struct FacetQueries: AlgoliaCommand {
+          
+          let method: HTTPMethod = .post
+          let callType: CallType = .read
+          let path: URL
+          let body: Data?
+          let requestOptions: RequestOptions?
+          
+          init(indexName: IndexName,
+               queries: [Query],
+               attribute: Attribute,
+               requestOptions: RequestOptions?) {
+              let queries = queries
+                  .map {IndexedFacetQuery(indexName: indexName, attribute: attribute, facetQuery: "", query: $0) }
+                  .map(MultiSearchQuery.init)
+              self.init(queries: queries,
+                        strategy: .none,
+                        requestOptions: requestOptions)
+          }
+          
+          init(queries: [IndexedQuery],
+               strategy: MultipleQueriesStrategy = .none,
+               requestOptions: RequestOptions?) {
+              let queries = queries.map(MultiSearchQuery.init)
+              self.init(queries: queries,
+                        strategy: strategy,
+                        requestOptions: requestOptions)
+          }
+          
+          init(queries: [MultiSearchQuery],
+               strategy: MultipleQueriesStrategy = .none,
+               requestOptions: RequestOptions?) {
+              self.requestOptions = requestOptions
+              self.body = MultipleQueriesRequest(requests: queries, strategy: strategy).httpBody
+              self.path = URL
+                  .indexesV1
+                  .appending(.asterisk)
+                  .appending(.queries)
+          }
+          
+      }
 
   }
 
