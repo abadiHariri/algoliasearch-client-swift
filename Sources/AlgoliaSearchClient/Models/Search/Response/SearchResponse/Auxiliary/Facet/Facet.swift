@@ -14,12 +14,24 @@ public struct Facet: Codable, Equatable, Hashable {
     public let value: String
     public let count: Int
     public let highlighted: String?
-
+    public let facetNumaricValue: Int
+    
   public init(value: String, count: Int, highlighted: String? = nil) {
     self.value = value
     self.count = count
     self.highlighted = highlighted
+      
+    self.facetNumaricValue =  value.extractedNumber ?? .max
   }
+    
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        
+        self.value = try container.decode(String.self, forKey: .value)
+        self.count = try container.decode(Int.self, forKey: .count)
+        self.highlighted = (try? container.decodeIfPresent(String.self, forKey: .highlighted)) ?? nil
+        self.facetNumaricValue =  value.extractedNumber ?? .max
+    }
 }
 
 public extension Facet {
@@ -79,4 +91,10 @@ extension Dictionary where Key == String, Value == Int {
     }
   }
 
+}
+extension String {
+    var extractedNumber: Int? {
+        let digits = self.filter { $0.isNumber }
+        return Int(digits)
+    }
 }
