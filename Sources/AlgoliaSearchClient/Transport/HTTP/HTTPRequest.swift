@@ -74,9 +74,10 @@ class HTTPRequest<ResponseType: Decodable, Output>: AsyncOperation, ResultContai
       return
     }
 
+    let host = hostIterator.next()
+        
     do {
-
-      guard let host = hostIterator.next() else {
+      guard let host = host else {
         throw TransportError.noReachableHosts(intermediateErrors: intermediateErrors)
       }
 
@@ -98,6 +99,9 @@ class HTTPRequest<ResponseType: Decodable, Output>: AsyncOperation, ResultContai
 
     } catch let error {
       Logger.loggingService.log(level: .debug, message: error.localizedDescription)
+        if let host {
+            retryStrategy.notify(host: host, result: IntermediateResult.failure(error))
+        }
       if retryStrategy.canRetry(inCaseOf: error) {
         tryLaunch(request: request, intermediateErrors: intermediateErrors + [error])
       } else {
@@ -142,3 +146,43 @@ extension HTTPRequest where ResponseType == Output {
   }
 
 }
+//private func tryLaunch(request: URLRequest, intermediateErrors: [Error]) {
+//
+//  guard !isCancelled else {
+//    Logger.loggingService.log(level: .debug, message: "Request was cancelled")
+//    result = .failure(SyncOperationError.cancelled)
+//    return
+//  }
+//
+//  do {
+//
+//    guard let host = hostIterator.next() else {
+//      throw TransportError.noReachableHosts(intermediateErrors: intermediateErrors)
+//    }
+//
+//    let effectiveRequest = try request.switchingHost(by: host, withBaseTimeout: timeout)
+//    Logger.loggingService.log(level: .debug, message: description(for: effectiveRequest))
+//
+//    underlyingTask = requester.perform(request: effectiveRequest) { [weak self] (result: IntermediateResult) in
+//      guard let httpRequest = self else { return }
+//
+//      httpRequest.retryStrategy.notify(host: host, result: result)
+//
+//      switch result {
+//      case .failure(let error) where httpRequest.retryStrategy.canRetry(inCaseOf: error):
+//        httpRequest.tryLaunch(request: request, intermediateErrors: intermediateErrors + [error])
+//      default:
+//        httpRequest.result = result.map(httpRequest.transform)
+//      }
+//    }
+//
+//  } catch let error {
+//    Logger.loggingService.log(level: .debug, message: error.localizedDescription)
+//    if retryStrategy.canRetry(inCaseOf: error) {
+//      tryLaunch(request: request, intermediateErrors: intermediateErrors + [error])
+//    } else {
+//      result = .failure(error)
+//    }
+//  }
+//
+//}

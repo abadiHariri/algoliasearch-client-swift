@@ -1,6 +1,6 @@
 //
 //  Facet.swift
-//  
+//
 //
 //  Created by Vladislav Fitc on 19/03/2020.
 //
@@ -14,14 +14,14 @@ public struct Facet: Codable, Equatable, Hashable {
     public let value: String
     public let count: Int
     public let highlighted: String?
-    public let facetNumaricValue: Int
+    public let facetNumaricValue: Double
     
   public init(value: String, count: Int, highlighted: String? = nil) {
     self.value = value
     self.count = count
     self.highlighted = highlighted
       
-    self.facetNumaricValue =  value.extractedNumber ?? .max
+    self.facetNumaricValue = value.extractedDouble ?? value.extractedNumber ?? Double(Int.max)
   }
     
     public init(from decoder: Decoder) throws {
@@ -30,7 +30,7 @@ public struct Facet: Codable, Equatable, Hashable {
         self.value = try container.decode(String.self, forKey: .value)
         self.count = try container.decode(Int.self, forKey: .count)
         self.highlighted = (try? container.decodeIfPresent(String.self, forKey: .highlighted)) ?? nil
-        self.facetNumaricValue =  value.extractedNumber ?? .max
+        self.facetNumaricValue = value.extractedDouble ?? value.extractedNumber ?? Double(Int.max)
     }
 }
 
@@ -93,8 +93,27 @@ extension Dictionary where Key == String, Value == Int {
 
 }
 extension String {
-    var extractedNumber: Int? {
+    var extractedNumber: Double? {
         let digits = self.filter { $0.isNumber }
-        return Int(digits)
+        return Double(digits)
+    }
+}
+
+extension String {
+    
+    var extractedDouble: Double? {
+        let pattern = #"[-+]?\d+(\.\d+)?"#
+        guard
+            let regex = try? NSRegularExpression(pattern: pattern),
+            let match = regex.firstMatch(
+                in: self,
+                range: NSRange(self.startIndex..., in: self)
+            ),
+            let range = Range(match.range, in: self)
+        else {
+            return nil
+        }
+        
+        return Double(self[range])
     }
 }
