@@ -16,6 +16,6 @@ protocol RetryStrategy: AnyObject {
   func notify<T>(host: RetryableHost, result: Result<T, Swift.Error>)
 
   /// Check if a request can be retried on another host in case of provided error
-  func canRetry(inCaseOf error: Error) -> Bool
+    func canRetry(inCaseOf error: Error, host: RetryableHost?) -> Bool
 
 }

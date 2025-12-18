@@ -1,6 +1,6 @@
 //
 //  RetryableHost.swift
-//  
+//
 //
 //  Created by Vladislav Fitc on 19/02/2020.
 //
@@ -16,13 +16,15 @@ public struct RetryableHost {
   var isUp: Bool
   var lastUpdated: Date
   var retryCount: Int
-
-  public init(url: URL) {
-    self.init(url: url, callType: .universal)
+  let isCustomProxy:Bool
+    
+  public init(url: URL,isCustomProxy:Bool = false) {
+      self.init(url: url,isCustomProxy: isCustomProxy, callType: .universal)
   }
 
-  init(url: URL, callType: CallTypeSupport = .universal) {
+  init(url: URL,isCustomProxy:Bool = false, callType: CallTypeSupport = .universal) {
     self.url = url
+      self.isCustomProxy = isCustomProxy
     self.supportedCallTypes = callType
     self.isUp = true
     self.lastUpdated = .init()

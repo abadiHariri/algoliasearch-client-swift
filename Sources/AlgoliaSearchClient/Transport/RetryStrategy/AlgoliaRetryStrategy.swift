@@ -1,6 +1,6 @@
 //
 //  AlgoliaRetryStrategy.swift
-//  
+//
 //
 //  Created by Vladislav Fitc on 17/03/2020.
 //
@@ -64,7 +64,7 @@ class AlgoliaRetryStrategy: RetryStrategy {
       case .failure(let error) where isTimeout(error):
         hosts[hostIndex].hasTimedOut()
 
-      case .failure(let error) where isRetryable(error):
+      case .failure(let error) where isRetryable(error, host: host):
         hosts[hostIndex].hasFailed()
 
       case .failure:
@@ -74,14 +74,15 @@ class AlgoliaRetryStrategy: RetryStrategy {
 
   }
 
-  func isRetryable(_ error: Error) -> Bool {
+  func isRetryable(_ error: Error, host: RetryableHost?) -> Bool {
     switch error {
     case .requestError(let error) as TransportError where error is URLError:
       return true
 
     case .httpError(let httpError) as TransportError where !httpError.statusCode.belongs(to: .success, .clientError):
       return true
-
+    case .httpError(let httpError) as TransportError where httpError.statusCode == 404 && host?.isCustomProxy == true:
+      return true
     case .badHost as URLRequest.FormatError:
       return true
 
@@ -103,8 +104,8 @@ class AlgoliaRetryStrategy: RetryStrategy {
     }
   }
 
-  func canRetry<E: Error>(inCaseOf error: E) -> Bool {
-    return isTimeout(error) || isRetryable(error)
+  func canRetry<E: Error>(inCaseOf error: E, host: RetryableHost?) -> Bool {
+      return isTimeout(error) || isRetryable(error, host: host)
   }
 
 }

@@ -90,7 +90,7 @@ class HTTPRequest<ResponseType: Decodable, Output>: AsyncOperation, ResultContai
         httpRequest.retryStrategy.notify(host: host, result: result)
 
         switch result {
-        case .failure(let error) where httpRequest.retryStrategy.canRetry(inCaseOf: error):
+        case .failure(let error) where httpRequest.retryStrategy.canRetry(inCaseOf: error, host: host):
           httpRequest.tryLaunch(request: request, intermediateErrors: intermediateErrors + [error])
         default:
           httpRequest.result = result.map(httpRequest.transform)
@@ -102,7 +102,7 @@ class HTTPRequest<ResponseType: Decodable, Output>: AsyncOperation, ResultContai
         if let host {
             retryStrategy.notify(host: host, result: IntermediateResult.failure(error))
         }
-      if retryStrategy.canRetry(inCaseOf: error) {
+        if retryStrategy.canRetry(inCaseOf: error, host: host) {
         tryLaunch(request: request, intermediateErrors: intermediateErrors + [error])
       } else {
         result = .failure(error)
