@@ -19,7 +19,17 @@ extension URLRequest {
     guard let components = URLComponents(url: url, resolvingAgainstBaseURL: false) else { throw FormatError.malformedURL(url.absoluteString) }
     guard let updatedURL = components.set(\.host, to: host.url.absoluteString).url else { throw FormatError.badHost(host.url.absoluteString) }
     let updatedTimeout = TimeInterval(host.retryCount + 1) * baseTimeout
-    return self
+      var editedUrl  = self
+    
+      if host.isCustomProxy {
+          editedUrl = editedUrl.set(\.applicationID, to: nil)
+          editedUrl = editedUrl.set(\.apiKey, to: nil)
+          
+          editedUrl.allHTTPHeaderFields?.removeValue(forKey: HTTPHeaderKey.applicationID.rawValue)
+          editedUrl.allHTTPHeaderFields?.removeValue(forKey: HTTPHeaderKey.apiKey.rawValue)
+      }
+      
+    return editedUrl
       .set(\.url, to: updatedURL)
       .set(\.timeoutInterval, to: updatedTimeout)
   }
