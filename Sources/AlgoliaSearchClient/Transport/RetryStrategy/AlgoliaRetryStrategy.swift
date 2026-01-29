@@ -81,7 +81,7 @@ class AlgoliaRetryStrategy: RetryStrategy {
 
     case .httpError(let httpError) as TransportError where !httpError.statusCode.belongs(to: .success, .clientError):
       return true
-    case .httpError(let httpError) as TransportError where httpError.statusCode == 404 && host?.isCustomProxy == true:
+    case .httpError(let httpError) as TransportError where [404, 409, 425, 499, 429].contains(httpError.statusCode) && host?.isCustomProxy == true:
       return true
     case .badHost as URLRequest.FormatError:
       return true
