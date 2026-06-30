@@ -105,8 +105,10 @@ class AlgoliaRetryStrategy: RetryStrategy {
   }
 
   func canRetry<E: Error>(inCaseOf error: E, host: RetryableHost?) -> Bool {
-      return isTimeout(error) || isRetryable(error, host: host)
-  }
+        // Proxy is authoritative: never retry it — no timeout escalation, no cascade to fallback hosts.
+        if host?.isCustomProxy == true { return false }
+        return isTimeout(error) || isRetryable(error, host: host)
+    }
 
 }
 
