@@ -53,7 +53,21 @@ public struct InsightsClient: Credentials {
     self.init(transport: httpTransport, operationLauncher: operationLauncher, configuration: configuration)
 
   }
-
+    
+    public init(appID: ApplicationID, customProxyURL: URL) {
+        
+        var configuration = InsightsConfiguration(applicationID: appID, apiKey: .init(rawValue: ""), region: nil)
+        configuration.hosts = [RetryableHost(url: customProxyURL, isCustomProxy: true)]
+        
+        let sessionConfiguration: URLSessionConfiguration = .default
+        sessionConfiguration.httpAdditionalHeaders = configuration.defaultHeaders
+        
+        let session = URLSession(configuration: sessionConfiguration)
+        
+        self.init(configuration: configuration, requester: session)
+        
+    }
+    
   init(transport: Transport,
        operationLauncher: OperationLauncher,
        configuration: Configuration) {
