@@ -54,7 +54,7 @@ public struct InsightsClient: Credentials {
 
   }
     
-    public init(appID: ApplicationID, customProxyURL: URL) {
+    public init(appID: ApplicationID, customProxyURL: URL, requester: HTTPRequester?=nil) {
         
         var configuration = InsightsConfiguration(applicationID: appID, apiKey: .init(rawValue: ""), region: nil)
         configuration.hosts = [RetryableHost(url: customProxyURL, isCustomProxy: true)]
@@ -64,7 +64,7 @@ public struct InsightsClient: Credentials {
         
         let session = URLSession(configuration: sessionConfiguration)
         
-        self.init(configuration: configuration, requester: session)
+        self.init(configuration: configuration, requester: requester ?? session)
         
     }
     
