@@ -62,6 +62,15 @@ class HTTPRequest<ResponseType: Decodable, Output>: AsyncOperation, ResultContai
     self.hostIterator = retryStrategy.retryableHosts(for: callType)
   }
 
+  override func start() {
+    guard !isCancelled else {
+      result = .failure(SyncOperationError.cancelled)
+      return
+    }
+    state = .executing
+    main()
+  }
+
   override func main() {
     tryLaunch(request: request, intermediateErrors: [])
   }
